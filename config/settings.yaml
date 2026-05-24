@@ -1,0 +1,43 @@
+project:
+  name: nubank-sentiment-analysis
+  start_date: "2025-10-01"
+  end_date: "2026-03-31"
+  target_company: "Nubank"
+  keywords:
+    - atendimento
+    - segurança
+    - fraude
+    - golpe
+    - conta bloqueada
+    - pix
+    - cartão
+    - chat
+paths:
+  raw_dir: data/raw
+  bronze_dir: data/bronze
+  output_dir: data/output
+  models_dir: artifacts/models
+sources:
+  google_play:
+    enabled: true
+    app_id: com.nu.production
+    method: google-play-scraper
+  reclame_aqui:
+    enabled: true
+    method: web-scraping
+    use_selenium: false
+  consumidor_gov:
+    enabled: true
+    method: public-file-ingestion
+preprocessing:
+  language: pt
+  remove_duplicates: true
+  min_text_length: 3
+modeling:
+  vectorizer: tfidf
+  classifier: logistic_regression
+  test_size: 0.2
+  random_state: 42
+topics:
+  method: kmeans
+  n_topics: 6
