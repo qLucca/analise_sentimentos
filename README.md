@@ -4,7 +4,7 @@ Projeto técnico para operacionalizar o trabalho acadêmico "Análise de Sentime
 
 ## Problema de pesquisa
 
-Como a percepção de consumidores brasileiros sobre o atendimento ao cliente e a segurança do Nubank se distribui entre sentimentos positivos, negativos e neutros nas plataformas Google Play Store, Reclame Aqui e Consumidor.gov.br, no período de outubro de 2025 a março de 2026, e quais tópicos recorrentes estão associados a cada categoria de sentimento?
+Como a percepção de consumidores brasileiros sobre o atendimento ao cliente e a segurança do Nubank se distribui entre sentimentos positivos, negativos e neutros nas plataformas Google Play Store, YouTube e Consumidor.gov.br, no período de outubro de 2025 a março de 2026, e quais tópicos recorrentes estão associados a cada categoria de sentimento?
 
 ## Objetivo
 
@@ -13,13 +13,13 @@ Desenvolver um pipeline completo de Ciência de Dados para coletar, padronizar, 
 ## Fontes de dados
 
 - Google Play Store
-- Reclame Aqui
+- YouTube
 - Consumidor.gov.br
 
 ## Método de coleta por fonte
 
 - `Google Play Store`: biblioteca `google-play-scraper`. Justificativa: método mais simples e estável para avaliações públicas do app, sem assumir acesso à API oficial do desenvolvedor.
-- `Reclame Aqui`: scraping com `requests` + `BeautifulSoup` como primeira tentativa e `Selenium` apenas se houver dependência de JavaScript, paginação dinâmica ou bloqueio estrutural.
+- `YouTube`: coleta de comentários públicos via YouTube Data API para vídeos relacionados ao Nubank, com filtragem por período e relevância temática.
 - `Consumidor.gov.br`: ingestão de dados abertos ou arquivo público baixado manualmente/automaticamente. `Selenium` fica como alternativa para automação de navegação/download, se necessário.
 
 ## Arquitetura
@@ -104,7 +104,7 @@ O dashboard foi desenhado para consultar preferencialmente views e tabelas do SQ
 
 ## Limitações conhecidas
 
-- A estrutura do Reclame Aqui pode mudar e exigir ajuste no scraping.
+- A disponibilidade dos comentários do YouTube depende da paginação disponível e da presença pública dos vídeos relacionados ao Nubank.
 - Algumas fontes podem impor bloqueios, paginação limitada ou dependência de JavaScript.
 - O período de outubro de 2025 a março de 2026 dependerá da disponibilidade pública dos registros coletados.
 - Quando a automação total não for viável, o projeto documenta caminhos de ingestão manual sem descaracterizar a proposta acadêmica.
