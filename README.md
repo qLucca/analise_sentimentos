@@ -24,18 +24,24 @@ Desenvolver um pipeline completo de Ciência de Dados para coletar, padronizar, 
 
 ## Arquitetura
 
+O projeto segue uma organização em código + artefatos:
+
+- `src/`: lógica de coleta, pré-processamento, features, pipelines, tópicos e integração com SQL Server
+- `data/`: dados do pipeline organizados em arquitetura medalhão
+- `artifacts/`: modelos treinados, figuras e relatórios gerados em experimentos e notebooks
+- `dashboard/`: aplicação Streamlit
+- `notebooks/`: análise exploratória
+
+Fluxo resumido:
+
 ```text
 Fontes públicas
-  -> scripts Python de coleta
+  -> src/collectors
   -> data/raw/
-  -> padronização local
   -> data/bronze/
-  -> NLP e limpeza
-  -> SQL Server / silver
-  -> modelagem de sentimentos
-  -> clustering de tópicos
-  -> SQL Server / gold
-  -> Streamlit
+  -> data/silver/
+  -> data/gold/
+  -> SQL Server / dashboard
 ```
 
 ## Por que manter dados brutos fora do SQL Server
@@ -47,7 +53,19 @@ Fontes públicas
 
 ## Estrutura do projeto
 
-O projeto foi organizado em camadas de coleta, pré-processamento, modelagem, tópicos, carga em banco, dashboard e documentação técnica. A pasta `data/raw/` armazena apenas dados brutos, `data/bronze/` guarda arquivos padronizados locais, e os schemas `silver` e `gold` concentram a camada analítica no SQL Server.
+As camadas de dados seguem a arquitetura medalhão:
+
+- `data/raw/`: arquivos brutos coletados por fonte
+- `data/bronze/`: dados padronizados e unificados sem tratamento analítico profundo
+- `data/silver/`: dados tratados, limpos e preparados para modelagem e carga analítica
+- `data/gold/`: saídas prontas para consumo no dashboard, SQL Server e análise final
+- `data/sandbox/notebooks/`: saídas temporárias de notebooks que não fazem parte do pipeline oficial
+
+Para artefatos de exploração:
+
+- `artifacts/figures/notebooks/`: gráficos exportados por notebooks
+- `artifacts/reports/notebooks/`: tabelas e CSVs gerados em análises exploratórias
+- `artifacts/models/`: modelos serializados
 
 ## Configuração do ambiente
 
@@ -78,6 +96,12 @@ python -m venv .venv
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
+Organizacao sugerida dos scripts SQL:
+
+- `sql/schema/`: criacao de banco, schemas e tabelas
+- `sql/views/`: views de apoio ao dashboard
+- `sql/validation/`: consultas de conferencia apos carga
 
 ## Execução dos scripts
 

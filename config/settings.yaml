@@ -15,7 +15,9 @@ project:
 paths:
   raw_dir: data/raw
   bronze_dir: data/bronze
-  output_dir: data/output
+  silver_dir: data/silver
+  gold_dir: data/gold
+  sandbox_dir: data/sandbox
   models_dir: artifacts/models
 sources:
   google_play:

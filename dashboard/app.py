@@ -5,23 +5,14 @@ import pandas as pd
 import seaborn as sns
 import streamlit as st
 from pandas.io.formats.style import Styler
+from src.utils.paths import get_dashboard_dataset_paths
 
 st.set_page_config(
     page_title="Dashboard de Sentimentos do Nubank",
     layout="wide",
 )
 
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-PROCESSED_DATA_DIR = PROJECT_ROOT / "data" / "processed"
-CONSUMIDOR_GOV_DATA_DIR = PROJECT_ROOT / "data" / "raw" / "consumidor_gov"
-
-UNIFIED_DATASET_PATH = PROCESSED_DATA_DIR / "unified_dataset.csv"
-MODEL_COMPARISON_PATH = PROCESSED_DATA_DIR / "model_comparison_summary.csv"
-YOUTUBE_BERT_DATASET_PATH = (
-    PROCESSED_DATA_DIR / "youtube_with_predicted_sentiment_bertimbau.csv"
-)
-CONSUMIDOR_GOV_DATASET_PATH = CONSUMIDOR_GOV_DATA_DIR / "consumidor_gov_processed.csv"
+DASHBOARD_DATASET_PATHS = get_dashboard_dataset_paths()
 
 SECTION_OPTIONS = (
     "Visao Geral",
@@ -40,6 +31,175 @@ SENTIMENT_COLORS = {
     "Negativo": "#C0392B",
     "Neutro": "#7F8C8D",
 }
+SOURCE_COLORS = {
+    "Google Play": "#0F766E",
+    "YouTube": "#D9485F",
+    "Consumidor.gov": "#1D4ED8",
+}
+
+
+def apply_custom_theme() -> None:
+    st.markdown(
+        """
+        <style>
+            :root {
+                --bg-soft: #f5f7f4;
+                --card-bg: linear-gradient(135deg, #ffffff 0%, #f7fbf8 100%);
+                --accent: #0f766e;
+                --accent-soft: #dff3ef;
+                --text-main: #17342f;
+                --text-muted: #5f6f69;
+                --border-soft: rgba(23, 52, 47, 0.08);
+                --shadow-soft: 0 18px 45px rgba(18, 52, 45, 0.08);
+            }
+
+            .stApp {
+                background:
+                    radial-gradient(circle at top left, rgba(15, 118, 110, 0.10), transparent 32%),
+                    radial-gradient(circle at top right, rgba(217, 72, 95, 0.10), transparent 28%),
+                    linear-gradient(180deg, #f9fbf8 0%, #f2f6f2 100%);
+            }
+
+            .block-container {
+                padding-top: 2.2rem;
+                padding-bottom: 2rem;
+            }
+
+            .hero-panel {
+                background: linear-gradient(135deg, #113b35 0%, #1f6f67 58%, #d9485f 150%);
+                color: white;
+                padding: 1.8rem 1.8rem 1.4rem 1.8rem;
+                border-radius: 24px;
+                box-shadow: 0 22px 55px rgba(17, 59, 53, 0.22);
+                margin-bottom: 1.2rem;
+            }
+
+            .hero-eyebrow {
+                display: inline-block;
+                padding: 0.35rem 0.75rem;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.15);
+                font-size: 0.8rem;
+                font-weight: 700;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                margin-bottom: 0.85rem;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+                font-weight: 800;
+                line-height: 1.08;
+                margin: 0;
+            }
+
+            .hero-subtitle {
+                margin-top: 0.8rem;
+                color: rgba(255, 255, 255, 0.84);
+                font-size: 1rem;
+                max-width: 760px;
+            }
+
+            .hero-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.65rem;
+                margin-top: 1rem;
+            }
+
+            .filter-pill {
+                background: rgba(255, 255, 255, 0.14);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                border-radius: 999px;
+                padding: 0.45rem 0.8rem;
+                font-size: 0.86rem;
+            }
+
+            .metric-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border-soft);
+                border-radius: 20px;
+                padding: 1rem 1rem 0.95rem 1rem;
+                box-shadow: var(--shadow-soft);
+                min-height: 118px;
+            }
+
+            .metric-label {
+                color: var(--text-muted);
+                font-size: 0.88rem;
+                font-weight: 600;
+                margin-bottom: 0.45rem;
+            }
+
+            .metric-value {
+                color: var(--text-main);
+                font-size: 1.9rem;
+                font-weight: 800;
+                line-height: 1.05;
+            }
+
+            .metric-caption {
+                color: var(--text-muted);
+                font-size: 0.82rem;
+                margin-top: 0.35rem;
+            }
+
+            .section-card {
+                background: rgba(255, 255, 255, 0.84);
+                border: 1px solid var(--border-soft);
+                border-radius: 22px;
+                padding: 1rem 1rem 0.35rem 1rem;
+                box-shadow: var(--shadow-soft);
+                margin-bottom: 1rem;
+                backdrop-filter: blur(8px);
+            }
+
+            .section-heading {
+                color: var(--text-main);
+                font-size: 1.08rem;
+                font-weight: 800;
+                margin-bottom: 0.2rem;
+            }
+
+            .section-subheading {
+                color: var(--text-muted);
+                font-size: 0.87rem;
+                margin-bottom: 0.9rem;
+            }
+
+            div[data-testid="stSidebar"] {
+                background: linear-gradient(180deg, #f7fbf9 0%, #eef5f1 100%);
+                border-right: 1px solid rgba(23, 52, 47, 0.08);
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_metric_card(label: str, value: str, caption: str) -> None:
+    st.markdown(
+        f"""
+        <div class="metric-card">
+            <div class="metric-label">{label}</div>
+            <div class="metric-value">{value}</div>
+            <div class="metric-caption">{caption}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_section_intro(title: str, subtitle: str) -> None:
+    st.markdown(
+        f"""
+        <div class="section-card">
+            <div class="section-heading">{title}</div>
+            <div class="section-subheading">{subtitle}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def get_file_mtime_ns(path: Path) -> int:
@@ -54,35 +214,37 @@ def load_csv(path: Path, file_mtime_ns: int) -> pd.DataFrame:
 
 @st.cache_data(show_spinner=False)
 def load_unified_dataset(file_mtime_ns: int) -> pd.DataFrame:
-    return load_csv(UNIFIED_DATASET_PATH, file_mtime_ns)
+    return load_csv(DASHBOARD_DATASET_PATHS["Base unificada"], file_mtime_ns)
 
 
 @st.cache_data(show_spinner=False)
 def load_model_comparison_summary(file_mtime_ns: int) -> pd.DataFrame:
-    return load_csv(MODEL_COMPARISON_PATH, file_mtime_ns)
+    return load_csv(DASHBOARD_DATASET_PATHS["Resumo de modelos"], file_mtime_ns)
 
 
 @st.cache_data(show_spinner=False)
 def load_youtube_bert_dataset(file_mtime_ns: int) -> pd.DataFrame:
-    return load_csv(YOUTUBE_BERT_DATASET_PATH, file_mtime_ns)
+    return load_csv(DASHBOARD_DATASET_PATHS["YouTube + BERTimbau"], file_mtime_ns)
 
 
 @st.cache_data(show_spinner=False)
 def load_consumidor_gov_dataset(file_mtime_ns: int) -> pd.DataFrame:
-    return load_csv(CONSUMIDOR_GOV_DATASET_PATH, file_mtime_ns)
+    return load_csv(DASHBOARD_DATASET_PATHS["Consumidor.gov"], file_mtime_ns)
 
 
 def load_app_data() -> dict[str, pd.DataFrame]:
     return {
-        "Base unificada": load_unified_dataset(get_file_mtime_ns(UNIFIED_DATASET_PATH)),
+        "Base unificada": load_unified_dataset(
+            get_file_mtime_ns(DASHBOARD_DATASET_PATHS["Base unificada"])
+        ),
         "Resumo de modelos": load_model_comparison_summary(
-            get_file_mtime_ns(MODEL_COMPARISON_PATH)
+            get_file_mtime_ns(DASHBOARD_DATASET_PATHS["Resumo de modelos"])
         ),
         "YouTube + BERTimbau": load_youtube_bert_dataset(
-            get_file_mtime_ns(YOUTUBE_BERT_DATASET_PATH)
+            get_file_mtime_ns(DASHBOARD_DATASET_PATHS["YouTube + BERTimbau"])
         ),
         "Consumidor.gov": load_consumidor_gov_dataset(
-            get_file_mtime_ns(CONSUMIDOR_GOV_DATASET_PATH)
+            get_file_mtime_ns(DASHBOARD_DATASET_PATHS["Consumidor.gov"])
         ),
     }
 
@@ -128,7 +290,10 @@ def render_sidebar(
         .tolist()
     )
 
-    st.sidebar.header("Filtros")
+    st.sidebar.markdown("## Painel de Filtros")
+    st.sidebar.caption(
+        "Controle periodo, secao analitica e o recorte de sentimento do YouTube."
+    )
     selected_section = st.sidebar.radio("Secao", SECTION_OPTIONS)
     selected_date_range = st.sidebar.date_input(
         "Intervalo de datas",
@@ -229,6 +394,49 @@ def build_model_comparison_table(modelos_dataframe: pd.DataFrame) -> pd.DataFram
 
 def format_integer(value: int) -> str:
     return f"{value:,}".replace(",", ".")
+
+
+def format_percentage(value: float) -> str:
+    return f"{value:.1%}"
+
+
+def get_date_span_label(
+    start_date: pd.Timestamp,
+    end_date: pd.Timestamp,
+) -> str:
+    return f"{start_date.strftime('%d/%m/%Y')} ate {end_date.strftime('%d/%m/%Y')}"
+
+
+def build_source_volume_summary(unified_dataframe: pd.DataFrame) -> pd.DataFrame:
+    source_volume = (
+        unified_dataframe["fonte"]
+        .fillna("desconhecido")
+        .value_counts()
+        .rename_axis("fonte")
+        .reset_index(name="volume")
+    )
+    source_volume["fonte"] = source_volume["fonte"].map(format_source_label)
+    total_volume = source_volume["volume"].sum()
+    source_volume["participacao"] = source_volume["volume"].map(
+        lambda value: value / total_volume if total_volume else 0
+    )
+    return source_volume
+
+
+def build_unified_monthly_volume(unified_dataframe: pd.DataFrame) -> pd.DataFrame:
+    monthly_volume = unified_dataframe.dropna(subset=["data_publicacao"]).copy()
+    if monthly_volume.empty:
+        return pd.DataFrame(columns=["mes", "quantidade"])
+
+    monthly_volume["mes"] = (
+        monthly_volume["data_publicacao"].dt.to_period("M").dt.to_timestamp()
+    )
+    return (
+        monthly_volume.groupby("mes")
+        .size()
+        .reset_index(name="quantidade")
+        .sort_values("mes")
+    )
 
 
 def build_sentiment_summary(youtube_dataframe: pd.DataFrame) -> pd.DataFrame:
@@ -418,14 +626,39 @@ def style_model_comparison_table(modelos_dataframe: pd.DataFrame) -> Styler:
 
 
 def build_model_interpretation(modelos_dataframe: pd.DataFrame) -> str:
-    bert_row = modelos_dataframe.loc[modelos_dataframe["modelo"] == "BERTimbau"].iloc[0]
-    neutral_leader = modelos_dataframe.sort_values("f1_neutro", ascending=False).iloc[0]
+    if modelos_dataframe.empty or "modelo" not in modelos_dataframe:
+        return "Ainda nao ha comparacao de modelos disponivel para interpretacao."
+
+    bert_rows = modelos_dataframe.loc[modelos_dataframe["modelo"] == "BERTimbau"]
+    if not bert_rows.empty and {"accuracy", "roc_auc_macro"}.issubset(modelos_dataframe.columns):
+        bert_row = bert_rows.iloc[0]
+        if "f1_neutro" in modelos_dataframe.columns:
+            neutral_leader = modelos_dataframe.sort_values("f1_neutro", ascending=False).iloc[0]
+            return (
+                f"O BERTimbau lidera em accuracy ({bert_row['accuracy']:.2%}) e ROC AUC macro "
+                f"({bert_row['roc_auc_macro']:.2%}), indicando melhor desempenho geral. "
+                f"Entre os baselines classicos, {neutral_leader['modelo']} entrega o melhor equilibrio "
+                f"na classe Neutro com F1 de {neutral_leader['f1_neutro']:.2%}, mesmo sem superar o "
+                "transformer nas metricas globais."
+            )
+        return (
+            f"O BERTimbau aparece como principal referencia do painel, com accuracy de "
+            f"{bert_row['accuracy']:.2%} e ROC AUC macro de {bert_row['roc_auc_macro']:.2%}."
+        )
+
+    ranking_columns = [
+        column
+        for column in ["accuracy", "roc_auc_macro", "f1_macro"]
+        if column in modelos_dataframe.columns
+    ]
+    best_model = (
+        modelos_dataframe.sort_values(ranking_columns, ascending=False).iloc[0]
+        if ranking_columns
+        else modelos_dataframe.iloc[0]
+    )
     return (
-        f"O BERTimbau lidera em accuracy ({bert_row['accuracy']:.2%}) e ROC AUC macro "
-        f"({bert_row['roc_auc_macro']:.2%}), indicando melhor desempenho geral. "
-        f"Entre os baselines classicos, {neutral_leader['modelo']} entrega o melhor equilibrio "
-        f"na classe Neutro com F1 de {neutral_leader['f1_neutro']:.2%}, mesmo sem superar o "
-        "transformer nas metricas globais."
+        f"O melhor desempenho geral do painel, no recorte atual, pertence a "
+        f"{best_model['modelo']}. Use a tabela comparativa para aprofundar a leitura por metrica."
     )
 
 
@@ -460,22 +693,40 @@ def render_visao_geral(
     modelos_dataframe: pd.DataFrame,
     selected_date_range: tuple[pd.Timestamp, pd.Timestamp],
 ) -> None:
-    st.subheader("Visao Geral")
+    render_section_intro(
+        "Visao geral do ecossistema de dados",
+        "Panorama consolidado do volume coletado, distribuicao por fonte e recorte temporal filtrado.",
+    )
     total_registros = len(unified_dataframe)
     total_textual = unified_dataframe["texto_original"].fillna("").str.strip().ne("").sum()
     total_youtube = unified_dataframe["fonte"].eq("youtube").sum()
     total_consumidor_gov = unified_dataframe["fonte"].eq("consumidor_gov").sum()
 
     metric_columns = st.columns(4)
-    metric_columns[0].metric("Total de registros", f"{total_registros:,}".replace(",", "."))
-    metric_columns[1].metric("Total textual", f"{total_textual:,}".replace(",", "."))
-    metric_columns[2].metric(
-        "Registros do YouTube", f"{total_youtube:,}".replace(",", ".")
-    )
-    metric_columns[3].metric(
-        "Registros do Consumidor.gov",
-        f"{total_consumidor_gov:,}".replace(",", "."),
-    )
+    with metric_columns[0]:
+        render_metric_card(
+            "Total de registros",
+            format_integer(total_registros),
+            "Base completa considerada pelo recorte atual.",
+        )
+    with metric_columns[1]:
+        render_metric_card(
+            "Conteudo textual",
+            format_integer(total_textual),
+            "Linhas com texto disponivel para NLP e exploracao.",
+        )
+    with metric_columns[2]:
+        render_metric_card(
+            "YouTube",
+            format_integer(total_youtube),
+            "Comentarios e interacoes trazidos dos videos filtrados.",
+        )
+    with metric_columns[3]:
+        render_metric_card(
+            "Consumidor.gov",
+            format_integer(total_consumidor_gov),
+            "Reclamacoes estruturadas do canal publico.",
+        )
 
     filtered_dates = unified_dataframe["data_publicacao"].dropna()
     if filtered_dates.empty:
@@ -488,33 +739,54 @@ def render_visao_geral(
         f"{start_date.strftime('%d/%m/%Y')} a {end_date.strftime('%d/%m/%Y')}"
     )
 
-    source_volume = (
-        unified_dataframe["fonte"]
-        .fillna("desconhecido")
-        .value_counts()
-        .rename_axis("fonte")
-        .reset_index(name="volume")
-    )
-    source_volume["fonte"] = source_volume["fonte"].map(format_source_label)
+    source_volume = build_source_volume_summary(unified_dataframe)
+    monthly_volume = build_unified_monthly_volume(unified_dataframe)
 
-    chart_column, table_column = st.columns((1.4, 1), gap="large")
+    chart_column, trend_column = st.columns((1.15, 1), gap="large")
 
     with chart_column:
-        st.markdown("**Volume por fonte**")
+        st.markdown("**Mix de fontes**")
         figure, axis = plt.subplots(figsize=(8, 4.5))
-        sns.barplot(data=source_volume, x="fonte", y="volume", palette="Blues_d", ax=axis)
-        axis.set_xlabel("Fonte")
-        axis.set_ylabel("Quantidade de registros")
-        axis.set_title("Distribuicao de registros por fonte")
-        axis.tick_params(axis="x", rotation=10)
-        for container in axis.containers:
-            axis.bar_label(container, fmt="%.0f", padding=3)
-        sns.despine(ax=axis)
+        axis.pie(
+            source_volume["volume"],
+            labels=source_volume["fonte"],
+            autopct="%1.1f%%",
+            startangle=90,
+            colors=[
+                SOURCE_COLORS.get(label, "#7F8C8D")
+                for label in source_volume["fonte"]
+            ],
+            wedgeprops={"linewidth": 1, "edgecolor": "white"},
+        )
+        axis.set_title("Participacao relativa por fonte")
         st.pyplot(figure, clear_figure=True, use_container_width=True)
 
-    with table_column:
-        st.markdown("**Resumo por fonte**")
-        st.dataframe(source_volume, use_container_width=True, hide_index=True)
+    with trend_column:
+        st.markdown("**Evolucao mensal da base**")
+        if monthly_volume.empty:
+            st.info("Nao ha datas suficientes para construir a serie temporal da base.")
+        else:
+            figure, axis = plt.subplots(figsize=(8, 4.5))
+            sns.lineplot(
+                data=monthly_volume,
+                x="mes",
+                y="quantidade",
+                color="#0F766E",
+                linewidth=2.6,
+                marker="o",
+                ax=axis,
+            )
+            axis.set_xlabel("Mes")
+            axis.set_ylabel("Quantidade de registros")
+            axis.set_title("Crescimento mensal do volume consolidado")
+            axis.tick_params(axis="x", rotation=25)
+            sns.despine(ax=axis)
+            st.pyplot(figure, clear_figure=True, use_container_width=True)
+
+    st.markdown("**Resumo por fonte**")
+    source_table = source_volume.copy()
+    source_table["participacao"] = source_table["participacao"].map(format_percentage)
+    st.dataframe(source_table, use_container_width=True, hide_index=True)
 
     st.markdown("**Comparacao de modelos**")
     st.dataframe(
@@ -525,13 +797,60 @@ def render_visao_geral(
 
 
 def render_youtube_section(youtube_dataframe: pd.DataFrame) -> None:
-    st.subheader("YouTube + BERTimbau")
-    st.metric("Total de comentarios do YouTube", format_integer(len(youtube_dataframe)))
-
+    render_section_intro(
+        "YouTube + BERTimbau",
+        "Leitura do sentimento previsto nos comentarios, com distribuicao, tendencia mensal e exemplos recentes.",
+    )
     sentiment_summary = build_sentiment_summary(youtube_dataframe)
+    total_comments = len(youtube_dataframe)
+    positive_share = (
+        sentiment_summary.loc[sentiment_summary["sentimento"] == "Positivo", "quantidade"].sum()
+        / total_comments
+        if total_comments
+        else 0
+    )
+    negative_share = (
+        sentiment_summary.loc[sentiment_summary["sentimento"] == "Negativo", "quantidade"].sum()
+        / total_comments
+        if total_comments
+        else 0
+    )
+    neutral_share = (
+        sentiment_summary.loc[sentiment_summary["sentimento"] == "Neutro", "quantidade"].sum()
+        / total_comments
+        if total_comments
+        else 0
+    )
+
     monthly_sentiment_series = build_monthly_sentiment_series(youtube_dataframe)
     comment_examples = build_comment_examples(youtube_dataframe)
     frequent_words = build_frequent_words_table(youtube_dataframe)
+
+    metric_columns = st.columns(4)
+    with metric_columns[0]:
+        render_metric_card(
+            "Comentarios analisados",
+            format_integer(total_comments),
+            "Volume exibido apos filtros globais e do YouTube.",
+        )
+    with metric_columns[1]:
+        render_metric_card(
+            "Participacao positiva",
+            format_percentage(positive_share),
+            "Parcela dos comentarios com sinal favoravel.",
+        )
+    with metric_columns[2]:
+        render_metric_card(
+            "Participacao negativa",
+            format_percentage(negative_share),
+            "Parcela com maior potencial de friccao.",
+        )
+    with metric_columns[3]:
+        render_metric_card(
+            "Participacao neutra",
+            format_percentage(neutral_share),
+            "Comentarios informativos ou pouco polarizados.",
+        )
 
     summary_column, chart_column = st.columns((0.9, 1.4), gap="large")
 
@@ -592,15 +911,53 @@ def render_youtube_section(youtube_dataframe: pd.DataFrame) -> None:
 
 
 def render_consumidor_section(consumidor_dataframe: pd.DataFrame) -> None:
-    st.subheader("Consumidor.gov")
-    st.metric("Total de registros", format_integer(len(consumidor_dataframe)))
+    render_section_intro(
+        "Consumidor.gov",
+        "Painel das reclamacoes estruturadas, com foco em categorias, status, notas e distribuicao territorial.",
+    )
+    notas_series = pd.to_numeric(consumidor_dataframe["nota"], errors="coerce").dropna()
+    mean_score = notas_series.mean() if not notas_series.empty else 0
+    solved_share = (
+        consumidor_dataframe["status"]
+        .fillna("")
+        .astype(str)
+        .str.contains("Resolvida|Finalizada", case=False, regex=True)
+        .mean()
+        if "status" in consumidor_dataframe
+        else 0
+    )
+    monthly_volume = build_monthly_volume(consumidor_dataframe)
+
+    metric_columns = st.columns(4)
+    with metric_columns[0]:
+        render_metric_card(
+            "Total de registros",
+            format_integer(len(consumidor_dataframe)),
+            "Volume estrutural do Consumidor.gov no recorte aplicado.",
+        )
+    with metric_columns[1]:
+        render_metric_card(
+            "Nota media",
+            f"{mean_score:.2f}" if mean_score else "-",
+            "Media das notas validas informadas pelos consumidores.",
+        )
+    with metric_columns[2]:
+        render_metric_card(
+            "Status resolvidos",
+            format_percentage(solved_share) if solved_share else "0.0%",
+            "Proporcao de registros com fechamento favoravel no status.",
+        )
+    with metric_columns[3]:
+        render_metric_card(
+            "Meses com volume",
+            format_integer(monthly_volume["mes"].nunique()),
+            "Cobertura temporal efetiva da serie analisada.",
+        )
 
     top_categories = build_top_n_counts(consumidor_dataframe, "categoria", top_n=8)
     top_problems = build_top_n_counts(consumidor_dataframe, "Problema", top_n=8)
     status_distribution = build_top_n_counts(consumidor_dataframe, "status", top_n=10)
     top_ufs = build_top_n_counts(consumidor_dataframe, "UF", top_n=10)
-    monthly_volume = build_monthly_volume(consumidor_dataframe)
-    notas_series = pd.to_numeric(consumidor_dataframe["nota"], errors="coerce").dropna()
 
     category_column, problem_column = st.columns(2, gap="large")
 
@@ -701,7 +1058,10 @@ def render_modelos_section(
     modelos_dataframe: pd.DataFrame,
     youtube_dataframe: pd.DataFrame,
 ) -> None:
-    st.subheader("Modelos")
+    render_section_intro(
+        "Modelos",
+        "Comparacao final das abordagens de classificacao e leitura contextual do melhor modelo no dataset previsto.",
+    )
     st.markdown("**Comparacao final de modelos**")
     st.dataframe(
         style_model_comparison_table(modelos_dataframe),
@@ -730,24 +1090,28 @@ def render_home(
     selected_date_range: tuple[pd.Timestamp, pd.Timestamp],
     selected_youtube_sentiment: str,
 ) -> None:
-    st.title("Dashboard de Sentimentos do Nubank")
-    st.caption("Estrutura base do dashboard com filtros globais e navegacao lateral.")
-
     start_date, end_date = selected_date_range
-    st.write(
-        f"Secao atual: **{selected_section}** | "
-        f"Periodo global: **{start_date.date()}** ate **{end_date.date()}**"
+    st.markdown(
+        f"""
+        <div class="hero-panel">
+            <div class="hero-eyebrow">Monitor de percepcao do cliente</div>
+            <h1 class="hero-title">Dashboard de Sentimentos do Nubank</h1>
+            <div class="hero-subtitle">
+                Uma leitura consolidada do que clientes e usuarios estao dizendo nas bases
+                textuais e estruturadas, com filtros globais e comparacao entre modelos.
+            </div>
+            <div class="hero-meta">
+                <div class="filter-pill">Secao: {selected_section}</div>
+                <div class="filter-pill">Periodo: {get_date_span_label(start_date, end_date)}</div>
+                <div class="filter-pill">Filtro YouTube: {selected_youtube_sentiment}</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    if selected_youtube_sentiment == "Todos":
-        st.write("Filtro de sentimento do YouTube: **Todos**")
-    else:
-        st.write(
-            "Filtro de sentimento do YouTube aplicado apenas na secao do YouTube: "
-            f"**{selected_youtube_sentiment}**"
-        )
-
-    status_rows = [
+    status_rows = pd.DataFrame(
+        [
         {
             "base": "Base unificada",
             "registros_filtrados": len(filtered_datasets["Base unificada"]),
@@ -768,9 +1132,14 @@ def render_home(
             "registros_filtrados": len(filtered_datasets["Resumo de modelos"]),
             "registros_exibidos_na_secao": len(filtered_datasets["Resumo de modelos"]),
         },
-    ]
+        ]
+    )
 
-    st.dataframe(pd.DataFrame(status_rows), use_container_width=True, hide_index=True)
+    render_section_intro(
+        "Status das bases carregadas",
+        "Comparativo rapido entre o volume filtrado no dataset e o volume efetivamente mostrado na secao ativa.",
+    )
+    st.dataframe(status_rows, use_container_width=True, hide_index=True)
 
     if selected_section == "Visao Geral":
         render_visao_geral(
@@ -791,6 +1160,7 @@ def render_home(
 
 def main() -> None:
     try:
+        apply_custom_theme()
         datasets = prepare_filterable_datasets(load_app_data())
         selected_section, selected_date_range, selected_youtube_sentiment = render_sidebar(
             datasets
