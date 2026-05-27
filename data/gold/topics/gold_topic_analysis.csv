@@ -1,9 +1,0 @@
-id_topico,nome_topico,palavras_chave,quantidade_registros,sentimento_predominante,fonte_predominante,data_processamento
-1,Empréstimo / crédito,"conta, cartao, credito, limite, emprestimo",9371,Negativo,youtube,2026-05-26 23:38:52.240554
-2,Crédito / oferta,"digital, plano, conta, quero, limite",8822,Positivo,google_play,2026-05-26 23:38:51.880121
-3,Crédito / elegibilidade,"cartao, credito, limite, conta, sao",7777,Negativo,google_play,2026-05-26 23:38:51.772468
-4,Cartão / uso,"pratico, facil, parabens, cartao, usar",6837,Positivo,google_play,2026-05-26 23:38:51.824512
-5,Conta bloqueada / acesso,"conta, consigo, estou, conseguindo, entrar",5846,Negativo,google_play,2026-05-26 23:38:51.976754
-6,Atendimento / suporte,"obrigado, atendimento, mt, satisfeito, exelente",4945,Positivo,google_play,2026-05-26 23:38:52.000764
-7,Cartão / uso,"cartao, parabens, pessimo, experiencia, atendimento",4874,Positivo,google_play,2026-05-26 23:38:52.266345
-8,Nota / 10,"nota, 10, nota 10, todos, eficiente",4215,Positivo,google_play,2026-05-26 23:38:51.605772
