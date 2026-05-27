@@ -38,8 +38,15 @@ GOLD_ANALYTICS_SENTIMENT_PATH = GOLD_ANALYTICS_DIR / "gold_sentiment_analysis.cs
 GOLD_TOPICS_ANALYSIS_PATH = GOLD_TOPICS_DIR / "gold_topic_analysis.csv"
 GOLD_DASHBOARD_UNIFIED_DATASET_PATH = GOLD_DASHBOARD_DIR / "unified_dataset.csv"
 GOLD_DASHBOARD_MODEL_COMPARISON_PATH = GOLD_DASHBOARD_DIR / "model_comparison_summary.csv"
+GOLD_DASHBOARD_SEMANTIC_CLUSTERS_PATH = GOLD_DASHBOARD_DIR / "semantic_cluster_summary.csv"
 GOLD_DASHBOARD_YOUTUBE_BERT_DATASET_PATH = (
     GOLD_DASHBOARD_DIR / "youtube_with_predicted_sentiment_bertimbau.csv"
+)
+GOLD_DASHBOARD_BERTIMBAU_FULL_DATASET_PATH = (
+    GOLD_DASHBOARD_DIR / "bertimbau_full_base_predictions.csv"
+)
+GOLD_DASHBOARD_PRIMARY_MODEL_DATASET_PATH = (
+    GOLD_DASHBOARD_DIR / "primary_model_predictions.csv"
 )
 GOLD_DASHBOARD_CLASSIC_SENTIMENT_PATH = (
     GOLD_DASHBOARD_DIR / "dados_com_sentimento_previsto.csv"
@@ -53,6 +60,9 @@ def get_dashboard_dataset_paths() -> dict[str, Path]:
     return {
         "Base unificada": GOLD_DASHBOARD_UNIFIED_DATASET_PATH,
         "Resumo de modelos": GOLD_DASHBOARD_MODEL_COMPARISON_PATH,
+        "Resumo de clusters": GOLD_DASHBOARD_SEMANTIC_CLUSTERS_PATH,
+        "Modelo principal": GOLD_DASHBOARD_PRIMARY_MODEL_DATASET_PATH,
+        "BERTimbau na base completa": GOLD_DASHBOARD_BERTIMBAU_FULL_DATASET_PATH,
         "YouTube + BERTimbau": GOLD_DASHBOARD_YOUTUBE_BERT_DATASET_PATH,
         "Consumidor.gov": RAW_CONSUMIDOR_GOV_PROCESSED_PATH,
     }

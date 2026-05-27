@@ -7,6 +7,7 @@ from src.database.load_silver_to_sqlserver import load_silver_reviews
 from src.utils.logger import setup_logging
 from src.utils.paths import (
     GOLD_ANALYTICS_SENTIMENT_PATH,
+    GOLD_DASHBOARD_MODEL_COMPARISON_PATH,
     GOLD_TOPICS_ANALYSIS_PATH,
     SILVER_UNIFIED_DATASET_PATH,
 )
@@ -21,6 +22,9 @@ def run() -> None:
     topics = pd.read_csv(GOLD_TOPICS_ANALYSIS_PATH)
     load_gold_dataframe(sentiment, "sentiment_analysis")
     load_gold_dataframe(topics, "topic_analysis")
+    if GOLD_DASHBOARD_MODEL_COMPARISON_PATH.exists():
+        metrics = pd.read_csv(GOLD_DASHBOARD_MODEL_COMPARISON_PATH)
+        load_gold_dataframe(metrics, "model_metrics")
 
 
 if __name__ == "__main__":

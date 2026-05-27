@@ -17,4 +17,6 @@ data/bronze/*.parquet
 data/output/*
 !data/output/.gitkeep
 models/
+!src/models/
+!src/models/*.py
 artifacts/
