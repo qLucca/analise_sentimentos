@@ -1,13 +1,34 @@
 from pathlib import Path
+import os
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CONFIG_DIR = PROJECT_ROOT / "config"
-DATA_DIR = PROJECT_ROOT / "data"
-RAW_DIR = DATA_DIR / "raw"
-BRONZE_DIR = DATA_DIR / "bronze"
-SILVER_DIR = DATA_DIR / "silver"
-GOLD_DIR = DATA_DIR / "gold"
+
+# Databricks Apps não expõe necessariamente DATABRICKS_RUNTIME_VERSION,
+# então detectamos tanto notebooks/clusters quanto o runtime de app.
+IS_DATABRICKS = any(
+    os.getenv(var_name)
+    for var_name in (
+        "DATABRICKS_RUNTIME_VERSION",
+        "DATABRICKS_APP_NAME",
+        "DATABRICKS_APP_PORT",
+    )
+)
+
+if IS_DATABRICKS:
+    # Unity Catalog volumes no Databricks
+    RAW_DIR = Path("/Volumes/analise_sentimento/bronze/vol_bronze/raw")
+    BRONZE_DIR = Path("/Volumes/analise_sentimento/bronze/vol_bronze")
+    SILVER_DIR = Path("/Volumes/analise_sentimento/silver/vol_silver")
+    GOLD_DIR = Path("/Volumes/analise_sentimento/gold/vol_gold")
+    DATA_DIR = Path("/Volumes/analise_sentimento")
+else:
+    DATA_DIR = PROJECT_ROOT / "data"
+    RAW_DIR = DATA_DIR / "raw"
+    BRONZE_DIR = DATA_DIR / "bronze"
+    SILVER_DIR = DATA_DIR / "silver"
+    GOLD_DIR = DATA_DIR / "gold"
 SANDBOX_DIR = DATA_DIR / "sandbox"
 NOTEBOOK_DATA_DIR = SANDBOX_DIR / "notebooks"
 
