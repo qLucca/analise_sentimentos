@@ -12,20 +12,27 @@ def build_connection_string() -> str:
     host = os.getenv("SQLSERVER_HOST", "localhost")
     database = os.getenv("SQLSERVER_DATABASE", "NubankSentimentAnalysis")
     user = os.getenv("SQLSERVER_USER", "")
+    password = os.getenv("SQLSERVER_PASSWORD", "")
     driver = os.getenv("SQLSERVER_DRIVER", "ODBC Driver 17 for SQL Server")
     trusted = os.getenv("SQLSERVER_TRUSTED_CONNECTION", "yes").lower()
+    trust_server_certificate = os.getenv("SQLSERVER_TRUST_SERVER_CERTIFICATE", "yes").lower()
+
+    common_params = (
+        f"DRIVER={{{driver}}};"
+        f"SERVER={host};"
+        f"DATABASE={database};"
+        f"TrustServerCertificate={trust_server_certificate};"
+    )
 
     if trusted == "yes":
         params = quote_plus(
-            f"DRIVER={{{driver}}};SERVER={host};DATABASE={database};Trusted_Connection=yes;"
+            f"{common_params}Trusted_Connection=yes;"
         )
     else:
         params = quote_plus(
-            f"DRIVER={{{driver}}};SERVER={host};DATABASE={database};UID={user};PWD={password};"
+            f"{common_params}UID={user};PWD={password};"
         )
     return f"mssql+pyodbc:///?odbc_connect={params}"
-
-print (build_connection_string())
 
 
 def get_engine():
