@@ -10,24 +10,9 @@ __pycache__/
 *.log
 *.db
 
-data/raw/**/*.csv
-data/raw/**/*.json
-data/raw/**/*.parquet
-
-data/bronze/**/*.csv
-data/bronze/**/*.json
-data/bronze/**/*.parquet
-
-data/silver/**/*.csv
-data/silver/**/*.json
-data/silver/**/*.parquet
-
-data/gold/**/*.csv
-data/gold/**/*.json
-data/gold/**/*.parquet
-
-data/output/**
-!data/output/.gitkeep
+data/**
+!data/.gitkeep
+!data/**/.gitkeep
 
 models/
 !src/models/
