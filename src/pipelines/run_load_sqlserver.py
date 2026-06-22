@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from src.database.load_gold_to_sqlserver import load_gold_dataframe
-from src.database.load_silver_to_sqlserver import load_silver_reviews
+from src.database.ingestion import load_gold_dataframe, load_silver_reviews
 from src.utils.logger import setup_logging
 from src.utils.paths import (
     GOLD_ANALYTICS_SENTIMENT_PATH,

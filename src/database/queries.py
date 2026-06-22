@@ -1,6 +1,18 @@
+from __future__ import annotations
+
+import pandas as pd
+
+from src.database.connection import get_engine
+
+
 GENERAL_METRICS_QUERY = "SELECT * FROM gold.vw_general_metrics"
 SENTIMENT_BY_SOURCE_QUERY = "SELECT * FROM gold.vw_sentiment_by_source"
 SENTIMENT_BY_MONTH_QUERY = "SELECT * FROM gold.vw_sentiment_by_month"
 TOPICS_BY_SENTIMENT_QUERY = "SELECT * FROM gold.vw_topics_by_sentiment"
 NEGATIVE_TOPICS_QUERY = "SELECT * FROM gold.vw_negative_topics"
 SOURCE_SUMMARY_QUERY = "SELECT * FROM gold.vw_source_summary"
+
+
+def run_query(query: str) -> pd.DataFrame:
+    engine = get_engine()
+    return pd.read_sql(query, con=engine)

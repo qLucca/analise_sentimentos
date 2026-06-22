@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from src.topics.topic_modeling import extract_topics
+from src.models.topic_modeling import extract_topics
 from src.utils.logger import setup_logging
 from src.utils.paths import (
     GOLD_ANALYTICS_SENTIMENT_PATH,

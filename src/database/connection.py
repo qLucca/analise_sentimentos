@@ -5,6 +5,7 @@ from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
 
 
 def build_connection_string() -> str:
@@ -35,5 +36,5 @@ def build_connection_string() -> str:
     return f"mssql+pyodbc:///?odbc_connect={params}"
 
 
-def get_engine():
+def get_engine() -> Engine:
     return create_engine(build_connection_string())

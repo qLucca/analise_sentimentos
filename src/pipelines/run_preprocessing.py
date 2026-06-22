@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from src.preprocessing.text_preprocessing import preprocess_reviews
+from processing.text_preprocessing import preprocess_reviews
 from src.utils.io import write_dataframe
 from src.utils.logger import setup_logging
 from src.utils.paths import (

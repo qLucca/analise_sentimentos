@@ -14,9 +14,20 @@ data/**
 !data/.gitkeep
 !data/**/.gitkeep
 
+outputs/*
+!outputs/.gitkeep
+!outputs/figures/.gitkeep
+!outputs/tables/.gitkeep
+!outputs/reports/.gitkeep
 models/
 !src/models/
 !src/models/*.py
 
 artifacts/**
 !artifacts/.gitkeep
+
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/*.tfvars
