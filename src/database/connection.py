@@ -10,6 +10,16 @@ from sqlalchemy.engine import Engine
 
 def build_connection_string() -> str:
     load_dotenv()
+    backend = os.getenv("DB_BACKEND", "").lower()
+
+    if backend == "mysql":
+        host = os.getenv("DB_HOST", "localhost")
+        port = os.getenv("DB_PORT", "3306")
+        database = os.getenv("DB_NAME", "analytics")
+        user = os.getenv("DB_USER", "")
+        password = os.getenv("DB_PASSWORD", "")
+        return f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
+
     host = os.getenv("SQLSERVER_HOST", "localhost")
     database = os.getenv("SQLSERVER_DATABASE", "NubankSentimentAnalysis")
     user = os.getenv("SQLSERVER_USER", "")
