@@ -1,0 +1,13 @@
+[Unit]
+Description=Nubank Sentiment Streamlit
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/opt/nubank-sentiment-analysis
+EnvironmentFile=/opt/nubank-sentiment-analysis/.env
+ExecStart=/opt/nubank-sentiment-analysis/.venv/bin/streamlit run dashboard/app.py --server.port 8501 --server.address 0.0.0.0
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

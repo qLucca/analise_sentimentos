@@ -23,11 +23,5 @@ models/
 !src/models/
 !src/models/*.py
 
-artifacts/**
-!artifacts/.gitkeep
-
-terraform/.terraform/
-terraform/.terraform.lock.hcl
-terraform/*.tfstate
-terraform/*.tfstate.backup
-terraform/*.tfvars
+artifacts/
+terraform/
