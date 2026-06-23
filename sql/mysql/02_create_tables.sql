@@ -32,3 +32,6 @@ CREATE TABLE IF NOT EXISTS sentiment_analysis (
     data_processamento DATETIME NULL,
     sentimento_previsto_bert VARCHAR(50) NULL
 );
+
+ALTER TABLE sentiment_analysis
+    ADD COLUMN IF NOT EXISTS sentimento_previsto_bert VARCHAR(50) NULL;
