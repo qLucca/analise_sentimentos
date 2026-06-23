@@ -33,5 +33,20 @@ CREATE TABLE IF NOT EXISTS sentiment_analysis (
     sentimento_previsto_bert VARCHAR(50) NULL
 );
 
-ALTER TABLE sentiment_analysis
-    ADD COLUMN IF NOT EXISTS sentimento_previsto_bert VARCHAR(50) NULL;
+SET @col_exists := (
+    SELECT COUNT(*)
+    FROM information_schema.columns
+    WHERE table_schema = 'gold'
+      AND table_name = 'sentiment_analysis'
+      AND column_name = 'sentimento_previsto_bert'
+);
+
+SET @ddl := IF(
+    @col_exists = 0,
+    'ALTER TABLE gold.sentiment_analysis ADD COLUMN sentimento_previsto_bert VARCHAR(50) NULL',
+    'SELECT "coluna sentimento_previsto_bert ja existe"'
+);
+
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
